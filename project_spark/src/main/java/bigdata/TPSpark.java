@@ -9,7 +9,7 @@ public class TPSpark {
 		
 		SparkConf conf = new SparkConf().setAppName("Projet BIGdata");
 		JavaSparkContext context = new JavaSparkContext(conf);
-		context.sequenceFile("user/pascal/dem3seq");
+		context.sequenceFile();
 
 	}
 	
