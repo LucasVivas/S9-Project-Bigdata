@@ -7,9 +7,10 @@ public class TPSpark {
 
 	public static void main(String[] args) {
 		
-		SparkConf conf = new SparkConf().setAppName("TP Spark");
+		SparkConf conf = new SparkConf().setAppName("Projet BIGdata");
 		JavaSparkContext context = new JavaSparkContext(conf);
-		
+		context.sequenceFile("user/pascal/dem3seq");
+
 	}
 	
 }
