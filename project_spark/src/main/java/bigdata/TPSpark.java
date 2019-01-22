@@ -1,5 +1,6 @@
 package bigdata;
 
+import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -17,11 +18,20 @@ public class TPSpark {
 		String path10 = "hgt/N44W001.hgt";
 		String path11 = "hgt/N44W002.hgt";
 
-		JavaPairRDD<String, PortableDataStream> rdd = context.binaryFiles
-				("hdfs://young:9000/user/pascal/dem3seq/N43W001.hgt");
+		JavaPairRDD<Text, IntArrayWritable> mainRDD = context.sequenceFile("hdfs://young:9000/user/pascal/dem3seq",
+				Text.class, IntArrayWritable.class);
 
+		JavaPairRDD<Text, IntArrayWritable> filterRDD = mainRDD.filter((x) -> {
+            if(x.toString().compareTo("hdfs://young:9000/user/raw_data/dem3/N44W002.hgt") == 0) {
+                System.out.println(x);
+                return true;
+            }
+            else
+                return false;
+        });
 
-		const int sizeX = 1200;
+		filterRDD.count();
+		/*const int sizeX = 1200;
 		const int sizeY = 1200;
 		const int TILEX = 75;
 		const int TILEY = 75;
@@ -40,7 +50,7 @@ public class TPSpark {
 
 			}
 		}
-
+    */
 	}
 
 }
