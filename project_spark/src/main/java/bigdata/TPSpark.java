@@ -5,32 +5,66 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.input.PortableDataStream;
+import scala.Tuple2;
+import scala.util.parsing.combinator.testing.Str;
+
+import java.awt.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class TPSpark {
+    public static final int SIZE_TUILE_X = 1201;
+    public static final int SIZE_TUILE_Y = 1201;
+
+    static JavaPairRDD<String, short[]> toShortArray(JavaPairRDD<String, PortableDataStream> rdd){
+        JavaPairRDD<String, short[]>newRDD = rdd.mapToPair(tuileTuple -> {
+            String name = tuileTuple._1;
+            PortableDataStream pds = tuileTuple._2;
+            byte[] contentByteArray = pds.toArray();
+            short[] outputShortArray = new short[SIZE_TUILE_X * SIZE_TUILE_Y];
+            ByteBuffer.wrap(contentByteArray).order(ByteOrder.BIG_ENDIAN).asShortBuffer().get(outputShortArray);
+            return new Tuple2<>(name, outputShortArray);
+        });
+        return newRDD;
+    }
+
+    static JavaPairRDD<String, Color[]> toColorArray(JavaPairRDD<String, short[]> rdd){
+        rdd.mapValues(shortArray -> {
+            short [] newArray = new short[shortArray.length];
+            for (int i = 0; i < shortArray.length; i++) {
+                short x = shortArray[i];
+                if(x<0) {
+                    x = 0;
+                }
+                else if(x>255) {
+                    x = 255;
+                }
+                newArray[i] = x;
+            }
+            return newArray;
+        });
+
+        JavaPairRDD<String, Color[]> newRDD = rdd.mapToPair(tuileTuple -> {
+            String name = tuileTuple._1;
+            Color[] colorArray = new Color[SIZE_TUILE_X * SIZE_TUILE_Y];
+            
+        });
+        return newRDD;
+    }
 
 	public static void main(String[] args) {
 
 		SparkConf conf = new SparkConf().setAppName("Projet BIGdata");
 		JavaSparkContext context = new JavaSparkContext(conf);
 
-		String path00 = "hgt/N43W001.hgt";
-		String path01 = "hgt/N43W002.hgt";
-		String path10 = "hgt/N44W001.hgt";
-		String path11 = "hgt/N44W002.hgt";
 
-		JavaPairRDD<Text, IntArrayWritable> mainRDD = context.sequenceFile("hdfs://young:9000/user/pascal/dem3seq",
-				Text.class, IntArrayWritable.class);
+		String pathLouis = "hdfs://young:9000/user/lleduc/hgt/";
 
-		JavaPairRDD<Text, IntArrayWritable> filterRDD = mainRDD.filter((x) -> {
-            if(x.toString().compareTo("hdfs://young:9000/user/raw_data/dem3/N44W002.hgt") == 0) {
-                System.out.println(x);
-                return true;
-            }
-            else
-                return false;
-        });
+		JavaPairRDD<String, PortableDataStream> mainRDD = context.binaryFiles
+                (pathLouis);
 
-		filterRDD.count();
+        JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
+
 		/*const int sizeX = 1200;
 		const int sizeY = 1200;
 		const int TILEX = 75;
@@ -47,10 +81,8 @@ public class TPSpark {
 						tab[y*1201 + x]
 					}
 				}
-
 			}
 		}
     */
 	}
-
 }
