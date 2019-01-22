@@ -8,7 +8,7 @@ import org.apache.spark.input.PortableDataStream;
 public class TPSpark {
 
 	public static void main(String[] args) {
-		
+
 		SparkConf conf = new SparkConf().setAppName("Projet BIGdata");
 		JavaSparkContext context = new JavaSparkContext(conf);
 
@@ -21,6 +21,26 @@ public class TPSpark {
 				("hdfs://young:9000/user/pascal/dem3seq/N43W001.hgt");
 
 
+		const int sizeX = 1200;
+		const int sizeY = 1200;
+		const int TILEX = 75;
+		const int TILEY = 75;
+		const int maxNbTileX = sizeX/TILEX;
+		const int maxNbTileY = sizeY/TILEY;
+
+		for(int caseY=0; caseY<maxNbTileY; caseY++){
+			for(int caseX=0; caseX<maxNbTileX; caseX++){
+
+				for(int y=caseY*TILEY; y<(caseY+1)*TILEY; y++){
+					for(int x=caseX*TILEX; x<(caseX+1)*TILEX; x++){
+
+						tab[y*1201 + x]
+					}
+				}
+
+			}
+		}
+
 	}
-	
+
 }
