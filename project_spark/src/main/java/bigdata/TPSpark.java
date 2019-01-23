@@ -8,13 +8,26 @@ import org.apache.spark.input.PortableDataStream;
 import scala.Tuple2;
 import scala.util.parsing.combinator.testing.Str;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class TPSpark {
-    public static final int SIZE_TUILE_X = 1201;
-    public static final int SIZE_TUILE_Y = 1201;
+    private static final int SIZE_TUILE_X = 1201;
+    private static final int SIZE_TUILE_Y = 1201;
+    private static final Color [] colorScale = {new Color(84,48,5),
+            new Color(140,81,10),
+            new Color(191,129,45),
+            new Color(223,194,125),
+            new Color(246,232,195),
+            new Color(245,245,245),
+            new Color(199,234,229),
+            new Color(128,205,193),
+            new Color(53,151,143),
+            new Color(1,102,94),
+            new Color(0,60,48)};
 
     static JavaPairRDD<String, short[]> toShortArray(JavaPairRDD<String, PortableDataStream> rdd){
         JavaPairRDD<String, short[]>newRDD = rdd.mapToPair(tuileTuple -> {
@@ -26,6 +39,10 @@ public class TPSpark {
             return new Tuple2<>(name, outputShortArray);
         });
         return newRDD;
+    }
+
+    static Color toColor(short s){
+        return colorScale[s/25];
     }
 
     static JavaPairRDD<String, Color[]> toColorArray(JavaPairRDD<String, short[]> rdd){
@@ -50,7 +67,7 @@ public class TPSpark {
 						short[] shortArray = tuileTuple._2;
 						for (int i = 0; i < shortArray.length; i++) {
                 short x = shortArray[i];
-                //colorArray[i] = x.toRGB();
+                colorArray[i] = toColor(x);
             }
             return new Tuple2<>(name, colorArray);
         });
