@@ -47,7 +47,7 @@ public class TPSpark {
         JavaPairRDD<String, Color[]> newRDD = rdd.mapToPair(tuileTuple -> {
             String name = tuileTuple._1;
             Color[] colorArray = new Color[SIZE_TUILE_X * SIZE_TUILE_Y];
-            
+
         });
         return newRDD;
     }
