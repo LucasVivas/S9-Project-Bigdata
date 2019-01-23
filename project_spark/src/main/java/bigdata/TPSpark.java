@@ -6,10 +6,10 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.input.PortableDataStream;
 import scala.Tuple2;
-import scala.util.parsing.combinator.testing.Str;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,17 +17,21 @@ import java.nio.ByteOrder;
 public class TPSpark {
     private static final int SIZE_TUILE_X = 1201;
     private static final int SIZE_TUILE_Y = 1201;
-    private static final Color [] colorScale = {new Color(84,48,5),
-            new Color(140,81,10),
-            new Color(191,129,45),
-            new Color(223,194,125),
-            new Color(246,232,195),
-            new Color(245,245,245),
-            new Color(199,234,229),
-            new Color(128,205,193),
-            new Color(53,151,143),
+    public static final int NB_TUILE_X = 2;
+    public static final int NB_TUILE_Y = 2  ;
+    public static final int SIZE_SUBTUILE_X = 600;
+    public static final int SIZE_SUBTUILE_Y = 600;
+    private static final Color [] colorScale = {new Color(0,60,48),
             new Color(1,102,94),
-            new Color(0,60,48)};
+            new Color(53,151,143),
+            new Color(128,205,193),
+            new Color(199,234,229),
+            new Color(245,245,245),
+            new Color(246,232,195),
+            new Color(223,194,125),
+            new Color(191,129,45),
+            new Color(140,81,10),
+            new Color(84,48,5)};
 
     static JavaPairRDD<String, short[]> toShortArray(JavaPairRDD<String, PortableDataStream> rdd){
         JavaPairRDD<String, short[]>newRDD = rdd.mapToPair(tuileTuple -> {
@@ -38,34 +42,41 @@ public class TPSpark {
             ByteBuffer.wrap(contentByteArray).order(ByteOrder.BIG_ENDIAN).asShortBuffer().get(outputShortArray);
             return new Tuple2<>(name, outputShortArray);
         });
-        return newRDD;
-    }
-
-    static Color toColor(short s){
-        return colorScale[s/25];
-    }
-
-    static JavaPairRDD<String, Color[]> toColorArray(JavaPairRDD<String, short[]> rdd){
-        rdd.mapValues(shortArray -> {
-            short [] newArray = new short[shortArray.length];
+        newRDD.mapValues(shortArray -> {
             for (int i = 0; i < shortArray.length; i++) {
                 short x = shortArray[i];
                 if(x<0) {
-                    x = 0;
+                    shortArray[i] = 0;
                 }
                 else if(x>255) {
-                    x = 255;
+                    shortArray[i] = 255;
                 }
-                newArray[i] = x;
+                else {
+                    shortArray[i] = x;
+                }
             }
-            return newArray;
+            return shortArray;
         });
+        return newRDD;
+    }
 
-        JavaPairRDD<String, Color[]> newRDD = rdd.mapToPair(tuileTuple -> {
+    static int toColor(short s){
+        Color color;
+        if (s<0)
+            color = colorScale[0];
+        else if (s>255)
+            color = colorScale[10];
+        else
+            color = colorScale[s/25];
+        return color.getRGB();
+    }
+
+    static JavaPairRDD<String, int[]> toColorArray(JavaPairRDD<String, short[]> rdd){
+        JavaPairRDD<String, int[]> newRDD = rdd.mapToPair(tuileTuple -> {
             String name = tuileTuple._1;
-            Color[] colorArray = new Color[SIZE_TUILE_X * SIZE_TUILE_Y];
-						short[] shortArray = tuileTuple._2;
-						for (int i = 0; i < shortArray.length; i++) {
+            int[] colorArray = new int[SIZE_TUILE_X * SIZE_TUILE_Y];
+            short[] shortArray = tuileTuple._2;
+            for (int i = 0; i < shortArray.length; i++) {
                 short x = shortArray[i];
                 colorArray[i] = toColor(x);
             }
@@ -74,13 +85,21 @@ public class TPSpark {
         return newRDD;
     }
 
-		public static void getSubImages(){
-				//BufferedImage bfImage = new BufferedImage(colorModel, raster, false, null);
-				for(int y=0; y<15; y++){
-					for(int x=0; x<15; x++){
-						ImageIO.write(bfImage.getSubimage(75*x, 75*y, 75, 75), "png", new File("output" + y + x + ".png"));
-					}
-				}
+		public static void getSubImages(JavaPairRDD<String, int[]> colorRDD){
+            colorRDD.foreach(colorTuile -> {
+                        int [] colors = colorTuile._2;
+                        BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
+                        image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, colors, 0, SIZE_TUILE_X);
+                        for (int y = 0; y < NB_TUILE_X; y++) {
+                            for (int x = 0; x < NB_TUILE_Y; x++) {
+                                ImageIO.write(image.getSubimage(SIZE_SUBTUILE_X*x, SIZE_SUBTUILE_Y*y,
+                                        SIZE_SUBTUILE_X, SIZE_SUBTUILE_Y), "png", new File
+                                        ("output/outputX" + y +"Y"+
+                                        x + ".png"));
+                            }
+                        }
+                    }
+            );
 		}
 
 	public static void main(String[] args) {
@@ -95,7 +114,10 @@ public class TPSpark {
                 (pathLouis);
 
         JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
+        JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
+        getSubImages(colorRDD);
 
+        colorRDD.count();
 		/*const int sizeX = 1200;
 		const int sizeY = 1200;
 		const int TILEX = 75;
