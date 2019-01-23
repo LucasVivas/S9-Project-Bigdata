@@ -47,10 +47,24 @@ public class TPSpark {
         JavaPairRDD<String, Color[]> newRDD = rdd.mapToPair(tuileTuple -> {
             String name = tuileTuple._1;
             Color[] colorArray = new Color[SIZE_TUILE_X * SIZE_TUILE_Y];
-
+						short[] shortArray = tuileTuple._2;
+						for (int i = 0; i < shortArray.length; i++) {
+                short x = shortArray[i];
+                //colorArray[i] = x.toRGB();
+            }
+            return new Tuple2<>(name, colorArray);
         });
         return newRDD;
     }
+
+		public static void getSubImages(){
+				//BufferedImage bfImage = new BufferedImage(colorModel, raster, false, null);
+				for(int y=0; y<15; y++){
+					for(int x=0; x<15; x++){
+						ImageIO.write(bfImage.getSubimage(75*x, 75*y, 75, 75), "png", new File("output" + y + x + ".png"));
+					}
+				}
+		}
 
 	public static void main(String[] args) {
 
