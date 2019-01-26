@@ -68,12 +68,13 @@ public class TPSpark {
         return color.getRGB();
     }
 
-    static int shortToColorArray(short[] s){
+    static int[] shortToColorArray(short[] s){
       int[] colorArray = new int[SIZE_TUILE_X * SIZE_TUILE_Y];
       for (int i = 0; i < s.length; i++) {
           short x = s[i];
           colorArray[i] = toColor(x);
       }
+      return colorArray;
     }
 
     static JavaPairRDD<String, int[]> toColorArray(JavaPairRDD<String, short[]> rdd){
