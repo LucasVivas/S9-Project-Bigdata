@@ -17,57 +17,54 @@ import java.nio.ByteOrder;
 public class TPSpark {
     private static final int SIZE_TUILE_X = 1201;
     private static final int SIZE_TUILE_Y = 1201;
-    public static final int NB_TUILE_X = 2;
-    public static final int NB_TUILE_Y = 2  ;
-    public static final int SIZE_SUBTUILE_X = 600;
-    public static final int SIZE_SUBTUILE_Y = 600;
-    private static final Color [] colorScale = {new Color(0,60,48),
+    public static final int NB_TUILE_X = 1;
+    public static final int NB_TUILE_Y = 1;
+    public static final int SIZE_SUBTUILE_X = 1200/NB_TUILE_X;
+    public static final int SIZE_SUBTUILE_Y = 1200/NB_TUILE_Y;
+    private static final Color [] colorScale = {
+            new Color(0,0,255),
+            new Color(0,60,48),
             new Color(1,102,94),
             new Color(53,151,143),
             new Color(128,205,193),
             new Color(199,234,229),
-            new Color(245,245,245),
             new Color(246,232,195),
             new Color(223,194,125),
             new Color(191,129,45),
             new Color(140,81,10),
-            new Color(84,48,5)};
+            new Color(84,48,5)
+    };
+    public static final int [] heightScale = {0, 5, 10, 25, 50, 75, 100, 150, 200, 225, 255};
+
+    static String splitName(String path){
+        String [] pathSplited = path.split("/");
+        String [] nameSplited = pathSplited[6].split("\\.");
+        return nameSplited[0];
+    }
 
     static JavaPairRDD<String, short[]> toShortArray(JavaPairRDD<String, PortableDataStream> rdd){
         JavaPairRDD<String, short[]>newRDD = rdd.mapToPair(tuileTuple -> {
-            String name = tuileTuple._1;
+            String name = splitName(tuileTuple._1);
             PortableDataStream pds = tuileTuple._2;
             byte[] contentByteArray = pds.toArray();
             short[] outputShortArray = new short[SIZE_TUILE_X * SIZE_TUILE_Y];
             ByteBuffer.wrap(contentByteArray).order(ByteOrder.BIG_ENDIAN).asShortBuffer().get(outputShortArray);
             return new Tuple2<>(name, outputShortArray);
         });
-        newRDD.mapValues(shortArray -> {
-            for (int i = 0; i < shortArray.length; i++) {
-                short x = shortArray[i];
-                if(x<0) {
-                    shortArray[i] = 0;
-                }
-                else if(x>255) {
-                    shortArray[i] = 255;
-                }
-                else {
-                    shortArray[i] = x;
-                }
-            }
-            return shortArray;
-        });
         return newRDD;
     }
 
     static int toColor(short s){
-        Color color;
-        if (s<0)
-            color = colorScale[0];
-        else if (s>255)
+        Color color = colorScale[0];
+        if (s>255)
             color = colorScale[10];
-        else
-            color = colorScale[s/25];
+        else {
+            for (int i = 0; i < heightScale.length - 1; i++) {
+                if (s > heightScale[i] && s <= heightScale[i + 1]) {
+                    color = colorScale[s / 25];
+                }
+            }
+        }
         return color.getRGB();
     }
 
@@ -87,14 +84,18 @@ public class TPSpark {
 
 		public static void getSubImages(JavaPairRDD<String, int[]> colorRDD){
             colorRDD.foreach(colorTuile -> {
+                        String name = colorTuile._1;
                         int [] colors = colorTuile._2;
+                        System.out.println("---------------------");
+                        System.out.println(name);
+
                         BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
                         image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, colors, 0, SIZE_TUILE_X);
                         for (int y = 0; y < NB_TUILE_X; y++) {
                             for (int x = 0; x < NB_TUILE_Y; x++) {
                                 ImageIO.write(image.getSubimage(SIZE_SUBTUILE_X*x, SIZE_SUBTUILE_Y*y,
                                         SIZE_SUBTUILE_X, SIZE_SUBTUILE_Y), "png", new File
-                                        ("output/outputX" + y +"Y"+
+                                        ("output/output"+name +"X" + y +"Y"+
                                         x + ".png"));
                             }
                         }
