@@ -5,6 +5,8 @@ import java.awt.*;
 public class Const {
     public static final int SIZE_TUILE_X = 1201;
     public static final int SIZE_TUILE_Y = 1201;
+    public static final int SIZE_GRID_X = 360;
+    public static final int SIZE_GRID_Y = 180;
     public static final int NB_TUILE_X = 1;
     public static final int NB_TUILE_Y = 1;
     public static final int SIZE_SUBTUILE_X = 1200/NB_TUILE_X;
