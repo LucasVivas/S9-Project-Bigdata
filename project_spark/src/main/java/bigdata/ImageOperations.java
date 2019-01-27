@@ -25,7 +25,7 @@ public class ImageOperations {
         if(nameArray[3] == 'w' || nameArray[3] == 'W'){
             x = 180 - (Character.getNumericValue(nameArray[4])*100 + Character.getNumericValue(nameArray[5])*10 + Character.getNumericValue(nameArray[6]));
         }else if(nameArray[3] == 'e' || nameArray[3] == 'E'){
-            y = 180 + (Character.getNumericValue(nameArray[4])*100 + Character.getNumericValue(nameArray[5])*10 + Character.getNumericValue(nameArray[6]));
+            x = 180 + (Character.getNumericValue(nameArray[4])*100 + Character.getNumericValue(nameArray[5])*10 + Character.getNumericValue(nameArray[6]));
         }
         Point2D.Double position = new Point2D.Double(x,y);
         return position;
@@ -38,6 +38,8 @@ public class ImageOperations {
                     int [] colors = colorTuile._2;
                     System.out.println("---------------------");
                     System.out.println(name);
+                    System.out.println(position.getX());
+                    System.out.println(position.getY());
 
                     BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
                     image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, colors, 0, SIZE_TUILE_X);
@@ -45,8 +47,8 @@ public class ImageOperations {
                         for (int x = 0; x < NB_TUILE_Y; x++) {
                             ImageIO.write(image.getSubimage(SIZE_SUBTUILE_X*x, SIZE_SUBTUILE_Y*y,
                                     SIZE_SUBTUILE_X, SIZE_SUBTUILE_Y), "png", new File
-                                    ("output/output"+ name + "X" + x*position.getX() + "Y" +
-                                            y*position.getY() + ".png"));
+                                    ("output/output" + "X" + (int)(x+(NB_TUILE_X*position.getX())) + "Y" +
+                                            (int)(y+(NB_TUILE_Y*position.getY())) + ".png"));
                         }
                     }
                 }
