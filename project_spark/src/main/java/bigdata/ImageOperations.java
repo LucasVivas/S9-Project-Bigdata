@@ -1,6 +1,9 @@
 package bigdata;
 
 import javafx.scene.layout.HBox;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.hbase.thirdparty.com.google.common.collect.Table;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
@@ -49,6 +52,8 @@ public class ImageOperations {
                             ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             HBase.createAndPutRow(byteArrayOS.toByteArray(), (int)(x+((zoom+1)*position.getX())), (int)(y+((zoom+1)*position.getY())), zoom);
+                            String[] args = {String.valueOf(x), String.valueOf(y), String.valueOf(zoom), byteArrayOS.toString()};
+                            ToolRunner.run(HBaseConfiguration.create(), new HBaseAdd(), args);
                         }
                     }
                 }

@@ -21,7 +21,7 @@ import static bigdata.Const.*;
 
 public class HBase extends Configured implements Tool {
 
-    private static Table table;
+
 
     public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas");
     public static final byte[] TILE = Bytes.toBytes("position");
@@ -53,7 +53,7 @@ public class HBase extends Configured implements Tool {
         }
     }
 
-    public static void createAndPutRow(byte[] img, int x, int y, int z){
+    public static Put createAndPutRow(byte[] img, int x, int y, int z){
         String Zoom = "Z" + z;
         String XPos = "X" + x;
         String YPos = "Y" + y;
@@ -63,11 +63,7 @@ public class HBase extends Configured implements Tool {
         put.addColumn(TILE, Y, Bytes.toBytes(YPos));
         put.addColumn(TILE, ZOOM, Bytes.toBytes(Zoom));
         put.addColumn(TILE, IMG, img);
-        try {
-            table.put(put);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        return put;
     }
 
     @Override
@@ -75,7 +71,6 @@ public class HBase extends Configured implements Tool {
         Configuration conf = getConf();
         Connection connection = ConnectionFactory.createConnection(conf);
         createTable(connection);
-        table = connection.getTable(TableName.valueOf(TABLE_NAME));
         return 0;
     }
 }
