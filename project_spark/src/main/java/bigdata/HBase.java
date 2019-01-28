@@ -60,8 +60,8 @@ public class HBase extends Configured implements Tool {
 
     public static Put createRow(int YPos, int zoomLevel) {
         String YRow = "Y" + YPos;
-        Put put = new Put(Bytes.toBytes(YRow);
-        for(int x=0; x<SIZE_GRID_X*zoomLevel; x++){
+        Put put = new Put(Bytes.toBytes(YRow));
+        for(int x=0; x<SIZE_GRID_X*(Math.pow(2,zoomLevel)); x++){
             String XCol = "X" + x;
             String img = XCol + YRow + ".png"; // Il faudra récupérer la vraie image
             put.addColumn(ZOOM[zoomLevel], Bytes.toBytes(XCol), Bytes.toBytes(img));
@@ -69,8 +69,8 @@ public class HBase extends Configured implements Tool {
         return put;
     }
 
-    public static void createAllRows(Table table, int zoomLevel){)
-        for(int y=0; y<SIZE_GRID_Y*zoomLevel; y++){
+    public static void createAllRows(Table table, int zoomLevel){
+        for(int y=0; y<SIZE_GRID_Y*(Math.pow(2,zoomLevel)); y++){
             try {
                 table.put(createRow(y, zoomLevel));
             }catch (IOException e){
