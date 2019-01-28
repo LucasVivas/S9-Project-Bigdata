@@ -7,13 +7,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.input.PortableDataStream;
 import scala.Tuple2;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import static bigdata.Const.*;
 import static bigdata.HeightOperations.toColorArray;
