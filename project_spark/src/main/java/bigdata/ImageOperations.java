@@ -1,10 +1,12 @@
 package bigdata;
 
 import org.apache.spark.api.java.JavaPairRDD;
+import scala.Tuple2;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static bigdata.Const.*;
@@ -31,7 +33,8 @@ public class ImageOperations {
         return position;
     }
 
-    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD){
+    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
+        int sizeSubTuile = 1200/(int)Math.pow(2,zoom);
         colorRDD.foreach(colorTuile -> {
                     String name = colorTuile._1;
                     Point2D.Double position = getImagePosition(name);
@@ -39,13 +42,11 @@ public class ImageOperations {
 
                     BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
                     image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, colors, 0, SIZE_TUILE_X);
-                    for (int y = 0; y < NB_TUILE_X; y++) {
-                        for (int x = 0; x < NB_TUILE_Y; x++) {
-                            ImageIO.write(image.getSubimage(SIZE_SUBTUILE_X*x, SIZE_SUBTUILE_Y*y,
-                                    SIZE_SUBTUILE_X, SIZE_SUBTUILE_Y), "png", new File
-                                    ("output/" + "X" + (int)(x+(NB_TUILE_X*position.getX())) + "Y" +
-                                            (int)(y+(NB_TUILE_Y*position.getY())) + ".png"));
-                            createRaw(x, y , int[])
+                    for (int y = 0; y < zoom+1; y++) {
+                        for (int x = 0; x < zoom+1; x++) {
+                            ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+                            ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
+                            HBase.createAndPutRow(byteArrayOS.toByteArray(), (int)(x+((zoom+1)*position.getX())), (int)(y+((zoom+1)*position.getY())), zoom);
                         }
                     }
                 }

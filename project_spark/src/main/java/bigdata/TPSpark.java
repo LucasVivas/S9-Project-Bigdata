@@ -28,7 +28,9 @@ public class TPSpark {
 
         JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
         JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
-        getSubImages(colorRDD);
+        for(int z=0; z<NB_SUBZOOM; z++) {
+			getSubImages(colorRDD, z);
+		}
 
         colorRDD.count();
 	}
