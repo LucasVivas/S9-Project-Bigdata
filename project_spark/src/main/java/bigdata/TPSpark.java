@@ -25,37 +25,17 @@ public class TPSpark {
 
 		String pathLouis = "hdfs://ripoux:9000/user/lleduc/hgt/";
 
-		JavaPairRDD<String, PortableDataStream> mainRDD = context.binaryFiles
-                (pathLouis);
+		JavaPairRDD<String, PortableDataStream> mainRDD = context.binaryFiles(pathLouis);
 
-        JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
-        JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
+    JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
+    JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
 		int exitCode = ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
 
 		for(int z=0; z<NB_SUBZOOM; z++) {
 			getSubImages(colorRDD, z);
 		}
 
-        colorRDD.count();
+		colorRDD.count();
 		System.exit(exitCode);
-		/*const int sizeX = 1200;
-		const int sizeY = 1200;
-		const int TILEX = 75;
-		const int TILEY = 75;
-		const int maxNbTileX = sizeX/TILEX;
-		const int maxNbTileY = sizeY/TILEY;
-
-		for(int caseY=0; caseY<maxNbTileY; caseY++){
-			for(int caseX=0; caseX<maxNbTileX; caseX++){
-
-				for(int y=caseY*TILEY; y<(caseY+1)*TILEY; y++){
-					for(int x=caseX*TILEX; x<(caseX+1)*TILEX; x++){
-
-						tab[y*1201 + x]
-					}
-				}
-			}
-		}
-    */
 	}
 }

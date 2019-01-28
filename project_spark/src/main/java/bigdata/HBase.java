@@ -6,15 +6,11 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.util.Tool;
-import org.apache.spark.api.java.JavaPairRDD;
-import scala.Tuple2;
-
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static bigdata.Const.*;
