@@ -14,6 +14,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static bigdata.Const.NB_TUILE_X;
@@ -58,14 +59,13 @@ public class HBase extends Configured implements Tool {
         }
     }
 
-    public static Put createRow(int YPos, int zoomLevel) {
+    public static byte [] imageToByte(int [] img){}
+
+    public static Put createRow(int XCol, int YPos, int zoomLevel, int [] img) {
         String YRow = "Y" + YPos;
         Put put = new Put(Bytes.toBytes(YRow));
-        for(int x=0; x<SIZE_GRID_X*(Math.pow(2,zoomLevel)); x++){
-            String XCol = "X" + x;
-            String img = XCol + YRow + ".png"; // Il faudra récupérer la vraie image
-            put.addColumn(ZOOM[zoomLevel], Bytes.toBytes(XCol), Bytes.toBytes(img));
-        }
+       // String img = XCol + YRow + ".png"; // Il faudra récupérer la vraie image
+        put.addColumn(ZOOM[zoomLevel], Bytes.toBytes(XCol), imageToByte(img));
         return put;
     }
 

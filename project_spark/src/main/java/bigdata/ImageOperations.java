@@ -45,6 +45,7 @@ public class ImageOperations {
                                     SIZE_SUBTUILE_X, SIZE_SUBTUILE_Y), "png", new File
                                     ("output/" + "X" + (int)(x+(NB_TUILE_X*position.getX())) + "Y" +
                                             (int)(y+(NB_TUILE_Y*position.getY())) + ".png"));
+                            createRaw(x, y , int[])
                         }
                     }
                 }
