@@ -70,13 +70,14 @@ public class HBase extends Configured implements Tool {
         createTable(connection);
         Table table = connection.getTable(TableName.valueOf(TABLE_NAME));
         if(args.length==1){
-            createDefaultRow(args[0]);
+            table.put(createDefaultRow(Bytes.toBytes(args[0])));
+        } else {
+            int x = Integer.parseInt(args[0]);
+            int y = Integer.parseInt(args[1]);
+            int z = Integer.parseInt(args[2]);
+            byte[] byteArray = Bytes.toBytes(args[3]);
+            table.put(createAndPutRow(byteArray, x, y, z));
         }
-        int x = Integer.parseInt(args[0]);
-        int y = Integer.parseInt(args[1]);
-        int z = Integer.parseInt(args[2]);
-        byte[] byteArray = Bytes.toBytes(args[3]);
-        table.put(HBase.createAndPutRow(byteArray, x, y, z));
         return 0;
     }
 }
