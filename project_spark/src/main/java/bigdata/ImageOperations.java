@@ -3,6 +3,7 @@ package bigdata;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
@@ -51,6 +52,35 @@ public class ImageOperations {
                     }
                 }
         );
+    }
+
+
+    public static void getMeanImage(int[][] imagesToMerge, int newX, int newY, int zoomLevel) throws Exception{
+        int meanImageLength = SIZE_TUILE_X*SIZE_TUILE_Y;
+        int[] meanImage = new int[meanImageLength];
+        int nbImages = imagesToMerge.length;
+        int imgBySide = (int)Math.sqrt(nbImages);
+
+        for(int i=0; i<nbImages; i++){
+            int [] image = imagesToMerge[i];
+            for(int y = 0; y < SIZE_TUILE_Y/imgBySide; y+=imgBySide) {
+                for (int x = 0; x < SIZE_TUILE_X/imgBySide; x+=imgBySide) {
+                    int currentY = ((y / imgBySide) * SIZE_TUILE_Y) + (SIZE_TUILE_Y / imgBySide) * SIZE_TUILE_X * (i / imgBySide);
+                    int currentX = x / imgBySide + (SIZE_TUILE_X / imgBySide) * (i % imgBySide);
+                    for(int sub=0; sub<nbImages; sub++){
+                        meanImage[currentY+currentX] += image[(y * SIZE_TUILE_Y) + (sub/imgBySide)*SIZE_TUILE_X + x + (sub%imgBySide)];
+                    }
+                    meanImage[currentY+currentX] /= nbImages;
+                }
+            }
+        }
+
+        BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
+        image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, meanImage, 0, SIZE_TUILE_X);
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", byteArrayOS);
+        String[] args = {String.valueOf(newX), String.valueOf(newY), String.valueOf(zoomLevel), byteArrayOS.toString()};
+        ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
     }
 
 }
