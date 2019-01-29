@@ -52,8 +52,22 @@ public class ImageOperations {
         return new Position(x, y);
     }
 
-    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom) {
-        int sizeSubTuile = 1200 / (int) Math.pow(2, zoom);
+    public static void generateDefaultImage() throws Exception{
+        int[] defaultTmage = new int[SIZE_TUILE_X*SIZE_TUILE_Y];
+        for(int i=0; i<defaultTmage.length; i++){
+            defaultTmage[i] = 0;
+        }
+        BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
+        image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, defaultTmage, 0, SIZE_TUILE_X);
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", byteArrayOS);
+        String[] args = {byteArrayOS.toString()};
+        ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
+
+    }
+
+    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
+        int sizeSubTuile = 1200/(int)Math.pow(2,zoom);
         colorRDD.foreach(colorTuile -> {
                     String name = colorTuile._1;
                     Position position = splitName(name);
@@ -65,12 +79,10 @@ public class ImageOperations {
                     for (int y = 0; y < zoom + 1; y++) {
                         for (int x = 0; x < zoom + 1; x++) {
                             ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-                            ImageIO.write(image.getSubimage(sizeSubTuile * x, sizeSubTuile * y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
-                            HBase.createAndPutRow(byteArrayOS.toByteArray(), (int) (x + ((zoom + 1) * position.getX())), (int)
-                                    (y + (
-                                            (zoom + 1)
-                                                    * position.getY())), zoom);
-                            String[] args = {String.valueOf(x), String.valueOf(y), String.valueOf(zoom), byteArrayOS.toString()};
+                            ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
+                            int XPos = (int)(x+((zoom+1)*position.getX()));
+                            int YPos = (int)(y+((zoom+1)*position.getY()));
+                            String[] args = {String.valueOf(XPos), String.valueOf(YPos), String.valueOf(zoom), byteArrayOS.toString()};
                             ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
                         }
                     }

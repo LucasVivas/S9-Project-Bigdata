@@ -56,12 +56,22 @@ public class HBase extends Configured implements Tool {
         return put;
     }
 
+    public static Put createDefaultRow(byte[] img){
+        String row = "default";
+        Put put = new Put(Bytes.toBytes(row));
+        put.addColumn(TILE, IMG, img);
+        return put;
+    }
+
     @Override
     public int run(String[] args) throws IOException{
         Configuration conf = getConf();
         Connection connection = ConnectionFactory.createConnection(conf);
         createTable(connection);
         Table table = connection.getTable(TableName.valueOf(TABLE_NAME));
+        if(args.length==1){
+            createDefaultRow(args[0]);
+        }
         int x = Integer.parseInt(args[0]);
         int y = Integer.parseInt(args[1]);
         int z = Integer.parseInt(args[2]);
