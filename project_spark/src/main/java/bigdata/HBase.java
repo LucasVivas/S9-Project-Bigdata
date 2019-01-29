@@ -9,11 +9,7 @@ import org.apache.hadoop.hbase.client.*;
 
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.util.Tool;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import static bigdata.Const.*;
 
 public class HBase extends Configured implements Tool {
 

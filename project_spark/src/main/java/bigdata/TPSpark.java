@@ -1,13 +1,11 @@
 package bigdata;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.input.PortableDataStream;
-import scala.Tuple2;
 
 
 import static bigdata.Const.*;

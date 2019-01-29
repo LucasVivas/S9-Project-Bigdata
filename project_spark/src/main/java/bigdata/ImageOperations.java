@@ -1,22 +1,15 @@
 package bigdata;
 
-import javafx.scene.layout.HBox;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.hbase.thirdparty.com.google.common.collect.Table;
 import org.apache.spark.api.java.JavaPairRDD;
-import scala.Tuple2;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import static bigdata.Const.*;
-import static bigdata.Const.SIZE_SUBTUILE_X;
-import static bigdata.Const.SIZE_SUBTUILE_Y;
 
 public class ImageOperations {
 
