@@ -53,7 +53,7 @@ public class ImageOperations {
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             HBase.createAndPutRow(byteArrayOS.toByteArray(), (int)(x+((zoom+1)*position.getX())), (int)(y+((zoom+1)*position.getY())), zoom);
                             String[] args = {String.valueOf(x), String.valueOf(y), String.valueOf(zoom), byteArrayOS.toString()};
-                            ToolRunner.run(HBaseConfiguration.create(), new HBaseAdd(), args);
+                            ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
                         }
                     }
                 }

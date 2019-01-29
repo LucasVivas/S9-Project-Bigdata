@@ -17,8 +17,6 @@ import static bigdata.Const.*;
 
 public class HBase extends Configured implements Tool {
 
-
-
     public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas");
     public static final byte[] TILE = Bytes.toBytes("position");
 
@@ -67,6 +65,12 @@ public class HBase extends Configured implements Tool {
         Configuration conf = getConf();
         Connection connection = ConnectionFactory.createConnection(conf);
         createTable(connection);
+        Table table = connection.getTable(TableName.valueOf(TABLE_NAME));
+        int x = Integer.parseInt(args[0]);
+        int y = Integer.parseInt(args[1]);
+        int z = Integer.parseInt(args[2]);
+        byte[] byteArray = Bytes.toBytes(args[3]);
+        table.put(HBase.createAndPutRow(byteArray, x, y, z));
         return 0;
     }
 }

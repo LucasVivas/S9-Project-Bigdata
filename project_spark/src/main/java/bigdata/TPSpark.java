@@ -23,7 +23,7 @@ public class TPSpark {
 		JavaSparkContext context = new JavaSparkContext(conf);
 
 
-		String pathLouis = "hdfs://ripoux:9000/user/lleduc/hgt/";
+		String pathLouis = "hdfs://young:9000/user/lleduc/hgt/";
 
 		JavaPairRDD<String, PortableDataStream> mainRDD = context.binaryFiles(pathLouis);
 
