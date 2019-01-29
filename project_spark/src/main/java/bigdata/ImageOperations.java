@@ -1,17 +1,15 @@
 package bigdata;
 
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.spark.api.java.JavaPairRDD;
-import scala.Tuple2;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import static bigdata.Const.*;
-import static bigdata.Const.SIZE_SUBTUILE_X;
-import static bigdata.Const.SIZE_SUBTUILE_Y;
 
 public class ImageOperations {
 
@@ -47,6 +45,8 @@ public class ImageOperations {
                             ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             HBase.createAndPutRow(byteArrayOS.toByteArray(), (int)(x+((zoom+1)*position.getX())), (int)(y+((zoom+1)*position.getY())), zoom);
+                            String[] args = {String.valueOf(x), String.valueOf(y), String.valueOf(zoom), byteArrayOS.toString()};
+                            ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
                         }
                     }
                 }
