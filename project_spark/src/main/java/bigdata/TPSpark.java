@@ -12,6 +12,7 @@ import static bigdata.Const.*;
 import static bigdata.HeightOperations.toColorArray;
 import static bigdata.HeightOperations.toShortArray;
 import static bigdata.ImageOperations.getMeanImage;
+import static bigdata.ImageOperations.getPosAbs;
 import static bigdata.ImageOperations.getSubImages;
 
 public class TPSpark {
@@ -27,6 +28,8 @@ public class TPSpark {
 
 		JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
 		JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
+		colorRDD = getPosAbs(colorRDD);
+
 
 
 		for(int z=0; z<NB_SUBZOOM; z++) {
