@@ -63,8 +63,7 @@ public class ImageOperations extends Configured implements Serializable {
         image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, defaultTmage, 0, SIZE_TUILE_X);
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
-        String[] args = {byteArrayOS.toString()};
-        ToolRunner.run(HBaseConfiguration.create(), new HBaseAdd(), args);
+        HBase.createDefaultRow(byteArrayOS.toByteArray());
 
     }
 
@@ -84,8 +83,7 @@ public class ImageOperations extends Configured implements Serializable {
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             int XPos = (int)(x+((zoom+1)*position.getX()));
                             int YPos = (int)(y+((zoom+1)*position.getY()));
-                            String[] args = {String.valueOf(XPos), String.valueOf(YPos), String.valueOf(zoom), byteArrayOS.toString()};
-                            ToolRunner.run(getConf(), new HBaseAdd(), args);
+                            HBase.createAndPutRow(byteArrayOS.toByteArray(),XPos, YPos, zoom);
                         }
                     }
                 }

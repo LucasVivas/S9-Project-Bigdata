@@ -32,12 +32,14 @@ public class TPSpark {
 		JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
 		colorRDD = getPosAbs(colorRDD);
 		int exitCode = ToolRunner.run(HBaseConfiguration.create(), new HBase(), new String[0]);
-
+        System.out.println("exitCode : "+exitCode);
 
 		generateDefaultImage();
-		for(int z=0; z<NB_SUBZOOM; z++) {
-			imageOperations.getSubImages(colorRDD, z);
-		}
+		//for(int z=0; z<NB_SUBZOOM; z++) {
+		//	imageOperations.getSubImages(colorRDD, z);
+		//}
+
+		imageOperations.getSubImages(colorRDD, 0);
 
 		/* for(int i=0; i<2; i++){
 			// Factor 2
@@ -60,6 +62,5 @@ public class TPSpark {
 		// Factor 5 */
 
 		colorRDD.count();
-		System.exit(exitCode);
 	}
 }

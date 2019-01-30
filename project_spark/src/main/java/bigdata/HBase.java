@@ -13,6 +13,9 @@ import java.io.IOException;
 
 public class HBase extends Configured implements Tool {
 
+    private static Connection connection;
+    private static Table table;
+
     public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas");
     public static final byte[] TILE = Bytes.toBytes("position");
 
@@ -43,7 +46,7 @@ public class HBase extends Configured implements Tool {
         }
     }
 
-    public static Put createAndPutRow(byte[] img, int x, int y, int z){
+    private static Put createPut(byte[] img, int x, int y, int z){
         String Zoom = "Z" + z;
         String XPos = "X" + x;
         String YPos = "Y" + y;
@@ -56,18 +59,37 @@ public class HBase extends Configured implements Tool {
         return put;
     }
 
-    public static Put createDefaultRow(byte[] img){
+    public static void createAndPutRow(byte[] img, int x, int y, int z){
+        Put put = createPut(img, x, y, z);
+        try {
+            table.put(put);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private static Put createDefaultPut(byte[] img){
         String row = "default";
         Put put = new Put(Bytes.toBytes(row));
         put.addColumn(TILE, IMG, img);
         return put;
     }
 
+    public static void createDefaultRow(byte[] img){
+        Put put = createDefaultPut(img);
+        try {
+            table.put(put);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public int run(String[] args) throws IOException{
         Configuration conf = getConf();
-        Connection connection = ConnectionFactory.createConnection(conf);
+        connection = ConnectionFactory.createConnection(conf);
         createTable(connection);
+        table = connection.getTable(TableName.valueOf(TABLE_NAME));
         return 0;
     }
 }
