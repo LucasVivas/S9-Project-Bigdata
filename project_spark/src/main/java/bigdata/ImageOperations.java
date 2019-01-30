@@ -23,14 +23,14 @@ public class ImageOperations extends Configured implements Serializable {
         char[] nameArray = name.toCharArray();
         int x = 0;
         int y = 0;
-        if (nameArray[0] == 'n' || nameArray[0] == 'N') {
+        if (Character.toLowerCase(nameArray[0]) == 'n') {
             y = 90 - (Character.getNumericValue(nameArray[1]) * 10 + Character.getNumericValue(nameArray[2]));
-        } else if (nameArray[0] == 's' || nameArray[0] == 'S') {
+        } else if (Character.toLowerCase(nameArray[0]) == 's') {
             y = 90 + (Character.getNumericValue(nameArray[1]) * 10 + Character.getNumericValue(nameArray[2]));
         }
-        if (nameArray[3] == 'w' || nameArray[3] == 'W') {
+        if (Character.toLowerCase(nameArray[3]) == 'w') {
             x = 180 - (Character.getNumericValue(nameArray[4]) * 100 + Character.getNumericValue(nameArray[5]) * 10 + Character.getNumericValue(nameArray[6]));
-        } else if (nameArray[3] == 'e' || nameArray[3] == 'E') {
+        } else if (Character.toLowerCase(nameArray[3]) == 'e') {
             x = 180 + (Character.getNumericValue(nameArray[4]) * 100 + Character.getNumericValue(nameArray[5]) * 10 + Character.getNumericValue(nameArray[6]));
         }
         Point2D.Double position = new Point2D.Double(x, y);
@@ -63,8 +63,7 @@ public class ImageOperations extends Configured implements Serializable {
         image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, defaultTmage, 0, SIZE_TUILE_X);
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
-        String[] args = {byteArrayOS.toString()};
-        ToolRunner.run(HBaseConfiguration.create(), new HBaseAdd(), args);
+        HBase.createDefaultRow(byteArrayOS.toByteArray());
 
     }
 
@@ -84,8 +83,7 @@ public class ImageOperations extends Configured implements Serializable {
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             int XPos = x + ((zoom+1) * position.getX());
                             int YPos = y + ((zoom+1) * position.getY());
-                            String[] args = {String.valueOf(XPos), String.valueOf(YPos), String.valueOf(zoom), byteArrayOS.toString()};
-                            ToolRunner.run(getConf(), new HBaseAdd(), args);
+                            HBase.createAndPutRow(byteArrayOS.toByteArray(),XPos, YPos, zoom);
                         }
                     }
                 }
