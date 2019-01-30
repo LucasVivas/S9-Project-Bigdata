@@ -2,6 +2,7 @@ package bigdata;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
@@ -11,9 +12,8 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.util.Tool;
 import java.io.IOException;
 
-public class HBase extends Configured implements Tool {
+public class HBase {
 
-    private static Connection connection;
     private static Table table;
 
     public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas");
@@ -30,6 +30,17 @@ public class HBase extends Configured implements Tool {
             admin.deleteTable(table.getTableName());
         }
         admin.createTable(table);
+    }
+
+    public HBase(){
+        Configuration conf = HBaseConfiguration.create();
+        try {
+            Connection connection = ConnectionFactory.createConnection(conf);
+            createTable(connection);
+            table = connection.getTable(TableName.valueOf(TABLE_NAME));
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public static void createTable(Connection connect) {
@@ -79,14 +90,5 @@ public class HBase extends Configured implements Tool {
         }catch (IOException e){
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public int run(String[] args) throws IOException{
-        Configuration conf = getConf();
-        connection = ConnectionFactory.createConnection(conf);
-        createTable(connection);
-        table = connection.getTable(TableName.valueOf(TABLE_NAME));
-        return 0;
     }
 }

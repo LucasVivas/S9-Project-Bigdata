@@ -19,6 +19,8 @@ import static bigdata.Const.*;
 
 public class ImageOperations extends Configured implements Serializable {
 
+    private static HBase hBase = new HBase();
+
     public static Point2D.Double getImagePosition(String name) {
         char[] nameArray = name.toCharArray();
         int x = 0;
@@ -63,11 +65,11 @@ public class ImageOperations extends Configured implements Serializable {
         image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, defaultTmage, 0, SIZE_TUILE_X);
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
-        HBase.createDefaultRow(byteArrayOS.toByteArray());
+        hBase.createDefaultRow(byteArrayOS.toByteArray());
 
     }
 
-    public void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
+    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
         int tileBySide = (int)Math.pow(2,zoom);
         int sizeSubTuile = 1200/tileBySide;
         colorRDD.foreach(colorTuile -> {
@@ -84,7 +86,7 @@ public class ImageOperations extends Configured implements Serializable {
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
                             int XPos = x+((tileBySide)*position.getX());
                             int YPos = y+((tileBySide)*position.getY());
-                            HBase.createAndPutRow(byteArrayOS.toByteArray(),XPos, YPos, zoom);
+                            hBase.createAndPutRow(byteArrayOS.toByteArray(),XPos, YPos, zoom);
                         }
                     }
                 }
@@ -148,7 +150,6 @@ public class ImageOperations extends Configured implements Serializable {
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
         String[] args = {String.valueOf(newX), String.valueOf(newY), String.valueOf(zoomLevel), byteArrayOS.toString()};
-        ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
     }
 
 }

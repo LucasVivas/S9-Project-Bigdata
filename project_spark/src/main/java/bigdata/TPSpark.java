@@ -17,8 +17,6 @@ import static bigdata.ImageOperations.getPosAbs;
 
 public class TPSpark {
 
-	public static ImageOperations imageOperations = new ImageOperations();
-
 	public static void main(String[] args) throws Exception{
 
 		SparkConf conf = new SparkConf().setAppName("Projet BIGdata");
@@ -31,23 +29,22 @@ public class TPSpark {
 		JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
 		JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
 		colorRDD = getPosAbs(colorRDD);
-		ToolRunner.run(HBaseConfiguration.create(), new HBase(), new String[0]);
 
 		generateDefaultImage();
 
 		//+1 for the original tail
 		for(int z=0; z<NB_SUBZOOM + 1; z++) {
-			imageOperations.getSubImages(colorRDD, z);
+			ImageOperations.getSubImages(colorRDD, z);
 		}
-
-		/* for(int i=0; i<2; i++){
+/*
+		for(int i=0; i<2; i++){
 			// Factor 2
 			int[][] imagesToMerge;
 			int XPos;
-			int YPos;
-			int ZoomLevel;
-			JavaPairRDD<String, int[]> unzoomedRDD = getMeanImage(imagesToMerge, XPos, YPos, ZoomLevel);
-		}
+            int YPos;
+            int ZoomLevel;
+            JavaPairRDD<String, int[]> unzoomedRDD = getMeanImage(imagesToMerge, XPos, YPos, ZoomLevel);
+        }
 
 		for(int i=0; i<2; i++){
 			// Factor 3
@@ -56,10 +53,9 @@ public class TPSpark {
 			int YPos;
 			int ZoomLevel;
 			getMeanImage();
-		}
+		}*/
 
-		// Factor 5 */
-
-		colorRDD.count();
+		// Factor 5
+        colorRDD.count();
 	}
 }

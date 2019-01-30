@@ -4,7 +4,7 @@ var mymap = L.map('mapid', {
     maxZoom: 10
 });
 
-L.tileLayer('http://vanhalen:8087/webapi/{z}/{x}/{y}')
+L.tileLayer('http://smith:8282/webapi/{z}/{x}/{y}')
     .addTo(mymap);
 
 function onMapClick(e) {

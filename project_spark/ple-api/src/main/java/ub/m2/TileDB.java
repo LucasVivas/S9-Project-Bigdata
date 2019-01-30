@@ -21,7 +21,7 @@ public class TileDB extends Configured implements Tool {
 
     public byte[] getTile(int z, int x, int y){
         byte[] img = null;
-        Get get = new Get(Bytes.toBytes("Z"+z+"X"+x+"Y"+y));//x+"."+y+"."+z));
+        Get get = new Get(Bytes.toBytes(x+"."+y+"."+z));
         try {
             img = table.get(get).value();
         } catch (IOException e){
