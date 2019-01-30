@@ -1,6 +1,8 @@
 package bigdata;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable{
     private int x;
     private int y;
 
@@ -8,7 +10,6 @@ public class Position {
         this.x = x;
         this.y = y;
     }
-
 
     public int getX() {
         return x;
