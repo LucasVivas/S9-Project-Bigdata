@@ -16,7 +16,7 @@ public class HBase extends Configured implements Tool {
     private static Connection connection;
     private static Table table;
 
-    public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas");
+    public static final byte[] TABLE_NAME = Bytes.toBytes("acfranger_lvivas_test");
     public static final byte[] TILE = Bytes.toBytes("position");
 
     public static final byte[] X = Bytes.toBytes("x");

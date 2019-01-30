@@ -11,9 +11,7 @@ import org.apache.spark.input.PortableDataStream;
 import static bigdata.Const.*;
 import static bigdata.HeightOperations.toColorArray;
 import static bigdata.HeightOperations.toShortArray;
-import static bigdata.ImageOperations.generateDefaultImage;
-import static bigdata.ImageOperations.getMeanImage;
-import static bigdata.ImageOperations.getPosAbs;
+import static bigdata.ImageOperations.*;
 
 public class TPSpark {
 
@@ -35,30 +33,26 @@ public class TPSpark {
 
 		generateDefaultImage();
 
-		//+1 for the original tail
-		for(int z=0; z<NB_SUBZOOM + 1; z++) {
+		// Generates the original tiles (at zoom 5) and the sub tiles (until zoom 10)
+		/*for(int z=5; z<NB_ZOOM; z++) {
 			imageOperations.getSubImages(colorRDD, z);
-		}
+		}*/
 
-		/* for(int i=0; i<2; i++){
-			// Factor 2
-			int[][] imagesToMerge;
-			int XPos;
-			int YPos;
-			int ZoomLevel;
-			JavaPairRDD<String, int[]> unzoomedRDD = getMeanImage(imagesToMerge, XPos, YPos, ZoomLevel);
-		}
-
+		// Generates zoom 3 and 4 by grouping 4 images
 		for(int i=0; i<2; i++){
-			// Factor 3
-			int[][] imagesToMerge;
-			int XPos;
-			int YPos;
-			int ZoomLevel;
-			getMeanImage();
+			JavaPairRDD<String, int[][]> unzoomedRDD = groupInSquare(colorRDD, 2);
+			colorRDD = applyMeanAndMergeImages(unzoomedRDD, 4-i);
 		}
 
-		// Factor 5 */
+		// Generates zoom 1 and 2 by grouping 9 images
+		for(int i=0; i<2; i++){
+			JavaPairRDD<String, int[][]> unzoomedRDD = groupInSquare(colorRDD, 3);
+			colorRDD = applyMeanAndMergeImages(unzoomedRDD, 2-i);
+		}
+
+		// Generates the original image with the full map
+		JavaPairRDD<String, int[][]> unzoomedRDD = groupInSquare(colorRDD, 2);
+		colorRDD = applyMeanAndMergeImages(unzoomedRDD, 0);
 
 		colorRDD.count();
 	}

@@ -11,7 +11,7 @@ public class Const {
     public static final int NB_TUILE_Y = 1;
     public static final int SIZE_SUBTUILE_X = 1200/NB_TUILE_X;
     public static final int SIZE_SUBTUILE_Y = 1200/NB_TUILE_Y;
-    public static final int NB_SUBZOOM = 4;
+    public static final int NB_ZOOM = 10;
     public static final Color[] colorScale = {
             new Color(0,0,255),
             new Color(0,60,48),

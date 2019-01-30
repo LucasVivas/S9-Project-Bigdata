@@ -64,7 +64,6 @@ public class ImageOperations extends Configured implements Serializable {
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
         HBase.createDefaultRow(byteArrayOS.toByteArray());
-
     }
 
     public void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
@@ -121,9 +120,18 @@ public class ImageOperations extends Configured implements Serializable {
         });
     }
 
-    
+    public static JavaPairRDD<String, int[]> applyMeanAndMergeImages(JavaPairRDD<String, int[][]> rdd, int zoomLevel){
+        JavaPairRDD<String, int[]> newRDD = rdd.mapToPair(currentTuile -> {
+            String name = currentTuile._1;
+            Position position = splitName(name);
+            int[][] imagesToMerge = currentTuile._2;
+            int[] unzoomedTuile = getMeanImage(imagesToMerge, position.getX(),position.getY(), zoomLevel);
+            return new Tuple2<>(name, unzoomedTuile);
+        });
+        return newRDD;
+    }
 
-    public static void getMeanImage(int[][] imagesToMerge, int newX, int newY, int zoomLevel) throws Exception {
+    public static int[] getMeanImage(int[][] imagesToMerge, int newX, int newY, int zoomLevel) throws Exception {
         int meanImageLength = SIZE_TUILE_X * SIZE_TUILE_Y;
         int[] meanImage = new int[meanImageLength];
         int nbImages = imagesToMerge.length;
@@ -135,8 +143,12 @@ public class ImageOperations extends Configured implements Serializable {
                 for (int x = 0; x < SIZE_TUILE_X / imgBySide; x += imgBySide) {
                     int currentY = ((y / imgBySide) * SIZE_TUILE_Y) + (SIZE_TUILE_Y / imgBySide) * SIZE_TUILE_X * (i / imgBySide);
                     int currentX = x / imgBySide + (SIZE_TUILE_X / imgBySide) * (i % imgBySide);
+                    System.out.println(currentX + " and " + currentY);
                     for (int sub = 0; sub < nbImages; sub++) {
-                        meanImage[currentY + currentX] += image[(y * SIZE_TUILE_Y) + (sub / imgBySide) * SIZE_TUILE_X + x + (sub % imgBySide)];
+                        int index = (y * SIZE_TUILE_Y) + (sub / imgBySide) * SIZE_TUILE_X + x + (sub % imgBySide);
+                        System.out.println(index);
+                        int imageToAdd =  image[index];
+                        meanImage[currentY + currentX] += imageToAdd;
                     }
                     meanImage[currentY + currentX] /= nbImages;
                 }
@@ -147,8 +159,9 @@ public class ImageOperations extends Configured implements Serializable {
         image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, meanImage, 0, SIZE_TUILE_X);
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
-        String[] args = {String.valueOf(newX), String.valueOf(newY), String.valueOf(zoomLevel), byteArrayOS.toString()};
-        ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
+        HBase.createAndPutRow(byteArrayOS.toByteArray(),newX, newY, zoomLevel);
+
+        return meanImage;
     }
 
 }
