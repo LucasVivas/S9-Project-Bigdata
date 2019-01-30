@@ -68,16 +68,6 @@ public class HBase extends Configured implements Tool {
         Configuration conf = getConf();
         Connection connection = ConnectionFactory.createConnection(conf);
         createTable(connection);
-        Table table = connection.getTable(TableName.valueOf(TABLE_NAME));
-        if(args.length==1){
-            table.put(createDefaultRow(Bytes.toBytes(args[0])));
-        } else {
-            int x = Integer.parseInt(args[0]);
-            int y = Integer.parseInt(args[1]);
-            int z = Integer.parseInt(args[2]);
-            byte[] byteArray = Bytes.toBytes(args[3]);
-            table.put(createAndPutRow(byteArray, x, y, z));
-        }
         return 0;
     }
 }

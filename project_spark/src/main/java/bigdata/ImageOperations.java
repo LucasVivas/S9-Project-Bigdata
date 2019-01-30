@@ -1,6 +1,7 @@
 package bigdata;
 
 import com.twitter.chill.Tuple1LongSerializer;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -12,10 +13,11 @@ import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
 import static bigdata.Const.*;
 
-public class ImageOperations {
+public class ImageOperations extends Configured implements Serializable {
 
     public static Point2D.Double getImagePosition(String name) {
         char[] nameArray = name.toCharArray();
@@ -62,11 +64,11 @@ public class ImageOperations {
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOS);
         String[] args = {byteArrayOS.toString()};
-        ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
+        ToolRunner.run(HBaseConfiguration.create(), new HBaseAdd(), args);
 
     }
 
-    public static void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
+    public void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
         int sizeSubTuile = 1200/(int)Math.pow(2,zoom);
         colorRDD.foreach(colorTuile -> {
                     String name = colorTuile._1;
@@ -83,7 +85,7 @@ public class ImageOperations {
                             int XPos = (int)(x+((zoom+1)*position.getX()));
                             int YPos = (int)(y+((zoom+1)*position.getY()));
                             String[] args = {String.valueOf(XPos), String.valueOf(YPos), String.valueOf(zoom), byteArrayOS.toString()};
-                            ToolRunner.run(HBaseConfiguration.create(), new HBase(), args);
+                            ToolRunner.run(getConf(), new HBaseAdd(), args);
                         }
                     }
                 }
