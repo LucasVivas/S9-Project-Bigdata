@@ -21,14 +21,14 @@ public class ImageOperations {
         char[] nameArray = name.toCharArray();
         int x = 0;
         int y = 0;
-        if (nameArray[0] == 'n' || nameArray[0] == 'N') {
+        if (Character.toLowerCase(nameArray[0]) == 'n') {
             y = 90 - (Character.getNumericValue(nameArray[1]) * 10 + Character.getNumericValue(nameArray[2]));
-        } else if (nameArray[0] == 's' || nameArray[0] == 'S') {
+        } else if (Character.toLowerCase(nameArray[0]) == 's') {
             y = 90 + (Character.getNumericValue(nameArray[1]) * 10 + Character.getNumericValue(nameArray[2]));
         }
-        if (nameArray[3] == 'w' || nameArray[3] == 'W') {
+        if (Character.toLowerCase(nameArray[3]) == 'w') {
             x = 180 - (Character.getNumericValue(nameArray[4]) * 100 + Character.getNumericValue(nameArray[5]) * 10 + Character.getNumericValue(nameArray[6]));
-        } else if (nameArray[3] == 'e' || nameArray[3] == 'E') {
+        } else if (Character.toLowerCase(nameArray[3]) == 'e') {
             x = 180 + (Character.getNumericValue(nameArray[4]) * 100 + Character.getNumericValue(nameArray[5]) * 10 + Character.getNumericValue(nameArray[6]));
         }
         Point2D.Double position = new Point2D.Double(x, y);
