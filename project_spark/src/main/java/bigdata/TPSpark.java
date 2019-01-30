@@ -31,15 +31,14 @@ public class TPSpark {
 		JavaPairRDD<String, short[]> shortRDD = toShortArray(mainRDD);
 		JavaPairRDD<String, int[]> colorRDD = toColorArray(shortRDD);
 		colorRDD = getPosAbs(colorRDD);
-		int exitCode = ToolRunner.run(HBaseConfiguration.create(), new HBase(), new String[0]);
-        System.out.println("exitCode : "+exitCode);
+		ToolRunner.run(HBaseConfiguration.create(), new HBase(), new String[0]);
 
 		generateDefaultImage();
-		//for(int z=0; z<NB_SUBZOOM; z++) {
-		//	imageOperations.getSubImages(colorRDD, z);
-		//}
 
-		imageOperations.getSubImages(colorRDD, 0);
+		//+1 for the original tail
+		for(int z=0; z<NB_SUBZOOM + 1; z++) {
+			imageOperations.getSubImages(colorRDD, z);
+		}
 
 		/* for(int i=0; i<2; i++){
 			// Factor 2

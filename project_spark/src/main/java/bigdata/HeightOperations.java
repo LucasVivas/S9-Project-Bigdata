@@ -13,7 +13,7 @@ import static bigdata.Const.SIZE_TUILE_Y;
 
 public class HeightOperations {
 
-    static String splitName(String path){
+    static String splitPath(String path){
         String [] pathSplited = path.split("/");
         String [] nameSplited = pathSplited[6].split("\\.");
         return nameSplited[0];
@@ -21,7 +21,7 @@ public class HeightOperations {
 
     static JavaPairRDD<String, short[]> toShortArray(JavaPairRDD<String, PortableDataStream> rdd){
         JavaPairRDD<String, short[]>newRDD = rdd.mapToPair(tuileTuple -> {
-            String name = splitName(tuileTuple._1);
+            String name = splitPath(tuileTuple._1);
             PortableDataStream pds = tuileTuple._2;
             byte[] contentByteArray = pds.toArray();
             short[] outputShortArray = new short[SIZE_TUILE_X * SIZE_TUILE_Y];

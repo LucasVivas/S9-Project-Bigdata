@@ -41,7 +41,7 @@ public class ImageOperations extends Configured implements Serializable {
         JavaPairRDD<String, int[]> newRDD = colorRDD.mapToPair(colorTuile -> {
             String name = colorTuile._1;
             Point2D.Double position = getImagePosition(name);
-            String newName = position.getX() + "." + position.getY();
+            String newName = (int)(position.getX()) + "." + (int)(position.getY());
             return new Tuple2<>(newName, colorTuile._2);
         });
         return newRDD;
@@ -68,21 +68,22 @@ public class ImageOperations extends Configured implements Serializable {
     }
 
     public void getSubImages(JavaPairRDD<String, int[]> colorRDD, int zoom){
-        int sizeSubTuile = 1200/(int)Math.pow(2,zoom);
+        int tileBySide = (int)Math.pow(2,zoom);
+        int sizeSubTuile = 1200/tileBySide;
         colorRDD.foreach(colorTuile -> {
                     String name = colorTuile._1;
-                    Position position = splitName(name);
-
                     int[] colors = colorTuile._2;
+
+                    Position position = splitName(name);
 
                     BufferedImage image = new BufferedImage(SIZE_TUILE_X, SIZE_TUILE_Y, BufferedImage.TYPE_INT_RGB);
                     image.setRGB(0, 0, SIZE_TUILE_X, SIZE_TUILE_Y, colors, 0, SIZE_TUILE_X);
-                    for (int y = 0; y < zoom + 1; y++) {
-                        for (int x = 0; x < zoom + 1; x++) {
+                    for (int y = 0; y < tileBySide; y++) {
+                        for (int x = 0; x < tileBySide; x++) {
                             ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
-                            int XPos = (int)(x+((zoom+1)*position.getX()));
-                            int YPos = (int)(y+((zoom+1)*position.getY()));
+                            int XPos = x+((tileBySide)*position.getX());
+                            int YPos = y+((tileBySide)*position.getY());
                             HBase.createAndPutRow(byteArrayOS.toByteArray(),XPos, YPos, zoom);
                         }
                     }

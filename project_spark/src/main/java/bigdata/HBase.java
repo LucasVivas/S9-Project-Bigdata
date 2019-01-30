@@ -47,14 +47,11 @@ public class HBase extends Configured implements Tool {
     }
 
     private static Put createPut(byte[] img, int x, int y, int z){
-        String Zoom = "Z" + z;
-        String XPos = "X" + x;
-        String YPos = "Y" + y;
-        String row = Zoom + XPos + YPos;
+        String row = x + "." + y + "." + z;
         Put put = new Put(Bytes.toBytes(row));
-        put.addColumn(TILE, X, Bytes.toBytes(XPos));
-        put.addColumn(TILE, Y, Bytes.toBytes(YPos));
-        put.addColumn(TILE, ZOOM, Bytes.toBytes(Zoom));
+        put.addColumn(TILE, X, Bytes.toBytes(x));
+        put.addColumn(TILE, Y, Bytes.toBytes(y));
+        put.addColumn(TILE, ZOOM, Bytes.toBytes(z));
         put.addColumn(TILE, IMG, img);
         return put;
     }
