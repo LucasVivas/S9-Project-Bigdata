@@ -35,9 +35,10 @@ public class TPSpark {
 
 
 		generateDefaultImage();
-		for(int z=0; z<NB_SUBZOOM; z++) {
+		/*for(int z=0; z<NB_SUBZOOM; z++) {
 			imageOperations.getSubImages(colorRDD, z);
-		}
+		}*/
+		imageOperations.getSubImages(colorRDD, 1);
 
 		/* for(int i=0; i<2; i++){
 			// Factor 2

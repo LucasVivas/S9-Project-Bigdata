@@ -82,8 +82,8 @@ public class ImageOperations extends Configured implements Serializable {
                         for (int x = 0; x < zoom + 1; x++) {
                             ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
                             ImageIO.write(image.getSubimage(sizeSubTuile*x, sizeSubTuile*y, sizeSubTuile, sizeSubTuile), "png", byteArrayOS);
-                            int XPos = (int)(x+((zoom+1)*position.getX()));
-                            int YPos = (int)(y+((zoom+1)*position.getY()));
+                            int XPos = x + ((zoom+1) * position.getX());
+                            int YPos = y + ((zoom+1) * position.getY());
                             String[] args = {String.valueOf(XPos), String.valueOf(YPos), String.valueOf(zoom), byteArrayOS.toString()};
                             ToolRunner.run(getConf(), new HBaseAdd(), args);
                         }
